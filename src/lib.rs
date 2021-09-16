@@ -32,6 +32,7 @@ mod transitivity;
 mod traversal;
 mod tree;
 mod union;
+mod lazy;
 
 use centrality::*;
 use coloring::*;
@@ -47,6 +48,7 @@ use transitivity::*;
 use traversal::*;
 use tree::*;
 use union::*;
+use lazy::*;
 
 use hashbrown::HashMap;
 use num_complex::Complex64;
@@ -301,6 +303,7 @@ fn retworkx(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     ))?;
     m.add_wrapped(wrap_pyfunction!(metric_closure))?;
     m.add_wrapped(wrap_pyfunction!(steiner_tree))?;
+    m.add_wrapped(wrap_pyfunction!(lazy_layers))?;
     m.add_class::<digraph::PyDiGraph>()?;
     m.add_class::<graph::PyGraph>()?;
     m.add_class::<iterators::BFSSuccessors>()?;
