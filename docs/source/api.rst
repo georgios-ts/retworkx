@@ -57,6 +57,7 @@ Traversal
 
    retworkx.dfs_edges
    retworkx.dfs_search
+   retworkx.bfs_search
    retworkx.bfs_successors
    retworkx.topological_sort
    retworkx.lexicographical_topological_sort
@@ -65,6 +66,7 @@ Traversal
    retworkx.collect_runs
    retworkx.collect_bicolor_runs
    retworkx.visit.DFSVisitor
+   retworkx.visit.BFSVisitor
 
 .. _dag-algorithms:
 
@@ -243,6 +245,7 @@ the functions from the explicitly typed based on the data type.
    retworkx.digraph_k_shortest_path_lengths
    retworkx.digraph_dfs_edges
    retworkx.digraph_dfs_search
+   retworkx.digraph_bfs_search
    retworkx.digraph_find_cycle
    retworkx.digraph_transitivity
    retworkx.digraph_core_number
@@ -287,6 +290,7 @@ typed API based on the data type.
    retworkx.graph_all_pairs_dijkstra_path_lengths
    retworkx.graph_dfs_edges
    retworkx.graph_dfs_search
+   retworkx.graph_bfs_search
    retworkx.graph_transitivity
    retworkx.graph_core_number
    retworkx.graph_complement
