@@ -77,6 +77,11 @@ use std::hash::Hash;
 
 use retworkx_core::dictmap::*;
 
+use crate::iterators::EdgeList;
+
+use digraph::PyDiGraph;
+use graph::PyGraph;
+
 trait IsNan {
     fn is_nan(&self) -> bool;
 }
@@ -269,6 +274,44 @@ where
     Ok(kvs.into_iter().collect::<Vec<_>>())
 }
 
+/// Holds a reference to a ``PyDiGraph`` or ``PyGraph`` object.
+#[derive(FromPyObject)]
+enum RefGraph<'a> {
+    #[pyo3(annotation = "PyDiGraph")]
+    Directed(PyRef<'a, PyDiGraph>),
+    #[pyo3(annotation = "PyGraph")]
+    UnDirected(PyRef<'a, PyGraph>),
+}
+
+/// Get a reference to ``StableGraph`` from a ``RefGraph``
+/// and give it as input to the provided ``lambda`` closure.
+macro_rules! call0 {
+    ($ref_graph: ident, |$graph: ident| $lambda: expr) => {
+        match $ref_graph {
+            RefGraph::Directed(g) => {
+                let $graph = &g.graph;
+                $lambda
+            }
+            RefGraph::UnDirected(g) => {
+                let $graph = &g.graph;
+                $lambda
+            }
+        }
+    };
+}
+
+/// Proof of concept for single dispatch mechanism in Rust side.
+///
+/// A Rust function exposed in Python that takes in a graph object,
+/// which can be either `retworkx.PyDiGraph` or `retworkx.PyGraph`,
+/// and calls via a rust macro the same closure for both graph types.
+#[pyfunction]
+fn works_for_both(graph: RefGraph, source: Option<usize>) -> EdgeList {
+    call0!(graph, |graph| EdgeList {
+        edges: retworkx_core::traversal::dfs_edges(graph, source.map(NodeIndex::new)),
+    })
+}
+
 // The provided node is invalid.
 create_exception!(retworkx, InvalidNode, PyException);
 // Performing this operation would result in trying to add a cycle to a DAG.
@@ -410,6 +453,7 @@ fn retworkx(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(biconnected_components))?;
     m.add_wrapped(wrap_pyfunction!(chain_decomposition))?;
     m.add_wrapped(wrap_pyfunction!(read_graphml))?;
+    m.add_wrapped(wrap_pyfunction!(works_for_both))?;
     m.add_class::<digraph::PyDiGraph>()?;
     m.add_class::<graph::PyGraph>()?;
     m.add_class::<toposort::TopologicalSorter>()?;
